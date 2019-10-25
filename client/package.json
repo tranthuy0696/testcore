@@ -5,9 +5,7 @@
   "description": "PCN Portal Core UI",
   "license": "Copyright 2019 PC Network Inc",
   "publishConfig": {
-    "registry": "http://192.168.88.33:8083/repository/private-npm/",
-    "_auth":"YWRtaW46YWRtaW4xMjM=",
-    "email":"admin@example.org"
+    "registry": "http://192.168.88.33:8083/repository/private-npm/"
   },
   "scripts": {
     "build": "ng build core-module",
