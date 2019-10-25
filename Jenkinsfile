@@ -25,9 +25,8 @@ pipeline {
         echo "Performing npm build..."
 					sh 'npm config set registry http://192.168.88.33:8083/repository/npm-group/'
           sh 'npm install'
-					sh 'cd client/ && npm install'
-					sh 'npm run build && cd ../'
-					sh 'npm run build'
+					sh 'cd client && npm install && echo $PWD && npm run build && cd ../ && npm run build'
+
           stash includes: 'dist/**/*', name: 'dist'
 					sh 'cd client/dist/core-module && npm publish && cd ../../../'
 					sh "tar -cvzf ${FILENAME} -C dist ."
