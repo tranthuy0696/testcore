@@ -23,7 +23,7 @@ pipeline {
           VERSION = "${RESULT[1]}"
         }
         echo "Performing npm build..."
-					sh 'npm config set registry http://192.168.88.33:8083/repository/npm-group/'
+					// sh 'npm config set registry http://192.168.88.33:8083/repository/npm-group/'
           sh 'npm install'
 					sh 'cd client && npm install && echo $PWD && npm run build && cd ../ && npm run build'
 
