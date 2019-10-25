@@ -4,7 +4,8 @@
   "description": "PCN Portal Core",
   "license": "Copyright 2019 PC Network Inc",
   "scripts": {
-    "build": "gulp build"
+    "build": "gulp build",
+    "publish": "cd client/dist/core-module && npm publish"
   },
   "author": "PCN",
   "dependencies": {
