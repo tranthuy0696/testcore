@@ -1,0 +1,21 @@
+<div class="col-8 field">
+  <core-select
+    [autoTagName]="'search-network'"
+    [items]="items"
+    [(ngModel)]="item"
+    (search)="instantSearch($event)"
+    (selected)="onSelected()"
+    [loading]="searching"
+    [textFields]="['CIDR', 'name']"
+    placeholder="4.2.0.0/16"
+    #select>
+  </core-select>
+  <span *ngIf="hasError" [ngClass]="{'invalid': hasError}">
+    <p> {{ 'NETWORK does not exist' | translate:term }} </p>
+  </span>
+</div>
+<div class="col-1">
+  <button auto-tag="jump-to-network" class="button full-width background-secondary" [disabled]="!goable()" (click)="search()">
+    {{ 'Go' | translate }}
+  </button>
+</div>

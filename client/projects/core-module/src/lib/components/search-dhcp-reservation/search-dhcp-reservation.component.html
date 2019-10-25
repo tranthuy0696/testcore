@@ -1,0 +1,52 @@
+<div class="col-3 field">
+  <select auto-tag="search-options" class="select" [(ngModel)]="searchBy" [ngModelOptions]="{standalone: true}" (ngModelChange)="onSearchByChange()">
+    <option auto-tag="search-ip-by-mac-address" value="SEARCH_BY_MAC">{{ 'Search by MAC' | translate:term }}</option>
+    <option auto-tag="search-ip-by-ip-address" value="SEARCH_BY_IP">{{ 'Search by IP' | translate:term }}</option>
+    <option auto-tag="search-ip-by-fqdn" value="SEARCH_BY_FQDN">{{ 'Search by FQDN' | translate:term }}</option>
+  </select>
+</div>
+<div class="col-8 field">
+  <core-select
+    [autoTagName]="'search-by-mac'"
+    [hidden]="searchBy !== 'SEARCH_BY_MAC'"
+    [(ngModel)]="searchedMac"
+    [ngModelOptions]="{standalone: true}"
+    (search)="instantSearch($event)"
+    (valueChange)="valueChange()"
+    [loading]="searching"
+    placeholder="da:be:ef:15:de:af"
+    #selectMac>
+  </core-select>
+  <core-select
+    [autoTagName]="'search-by-ip'"
+    [hidden]="searchBy !== 'SEARCH_BY_IP'"
+    [(ngModel)]="searchedAddress"
+    [ngModelOptions]="{standalone: true}"
+    (search)="instantSearch($event)"
+    (valueChange)="valueChange()"
+    [loading]="searching"
+    placeholder="4.2.8.8"
+    #selectIp>
+  </core-select>
+  <core-select
+    [autoTagName]="'search-by-fqdn'"
+    [hidden]="searchBy !== 'SEARCH_BY_FQDN'"
+    [items]="searchedHostRecords"
+    [(ngModel)]="searchedHostRecord"
+    (search)="instantSearch($event)"
+    [loading]="searching"
+    [textFields]="['fqdn']"
+    placeholder="zaphod.mostlyharmless.tld"
+    (selected) = "onSelected($event)"
+    (blur) = "onBlur($event)"
+    #selectFqdn>
+  </core-select>
+  <span *ngIf="hasError" [ngClass]="{'invalid': hasError}">
+    <p auto-tag="search-ip-error-message"> {{ errorMessage | translate:term }} </p>
+  </span>
+</div>
+<div class="col-1">
+  <button auto-tag="search-button" class="button full-width background-secondary" [disabled]="!goable()" (click)="search()">
+    {{ 'Go' | translate:term }}
+  </button>
+</div>

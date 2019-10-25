@@ -1,0 +1,7 @@
+<div class="tab-select" [ngClass]="clazz">
+  <div class="tab-item" *ngFor="let tab of tabs" [ngClass]="{ 'active': tab.active }" (click)="select(tab)">
+    <span class="tab-item-icon" *ngIf="tab.icon"><i [ngClass]="tab.icon"></i></span>
+    <span class="tab-item-label" [attr.auto-tag]="tab.label" *ngIf="tab.label">{{ tab.label }}</span>
+    <span class="tab-item-description" *ngIf="tab.description">{{ tab.description }}</span>
+  </div>
+</div>

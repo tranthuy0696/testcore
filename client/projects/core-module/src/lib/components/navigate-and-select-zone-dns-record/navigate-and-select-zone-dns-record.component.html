@@ -1,0 +1,64 @@
+<div class="row">
+  <div class="col-7" style="line-height: 28px">
+    <span class="pull-right">{{ 'Filter by Owner Name' | translate }}</span>
+  </div>
+  <div class="col-2 field">
+    <input auto-tag="owner-name" type="text" class="input" [(ngModel)]="filterByName" (ngModelChange)="onChangeFilter()">
+  </div>
+  <div class="col-1" style="line-height: 28px">
+    <span class="pull-right">{{ 'and Type' | translate:term }}</span>
+  </div>
+  <div class="col-2 field">
+    <select auto-tag="dns-record-type" class="select" [(ngModel)]="filterByType" (ngModelChange)="onChangeFilter()">
+      <option *ngFor="let type of TYPES" [value]="type">{{ type === 'HOST' ? 'A (Host)' : type }}</option>
+    </select>
+  </div>
+</div>
+<div class="row" style="padding: 0">
+  <div class="col-12">
+    <core-table-list [style]="['hs']"
+                      (cellClick)="onCellClick($event)" [highlightRowFunc]="highlightRowFunc"
+                      [data]="records"
+                      [loading]="loading"
+                      [placeholder]="'No Records Found' | translate:term"
+                      [showPlaceholder]="zone && (!records || records.length === 0)"
+                      auto-tag="existing-dns-record-children-container">
+      <core-table-list-column [header]="'Selected' | translate" [width]="'30px'">
+      <ng-template #headerTemplate>
+        <span></span>
+      </ng-template>
+      <ng-template #bodyTemplate let-row="row" let-index="index">
+        <span *ngIf="isSelectable(row)" class="table-cell-radio">
+          <input type="radio" name="selection" [checked]="row.selected" (change)="select(row)">
+        </span>
+      </ng-template>
+      </core-table-list-column>
+      <core-table-list-column [header]="'Owner Name' | translate" [width]="'30%'" [value]="'name'">
+        <ng-template #bodyTemplate let-row="row" let-index="index">
+            <span>
+              {{ row.name === '' ? '.' : row.name }}
+            </span>
+        </ng-template>
+      </core-table-list-column>
+      <core-table-list-column [header]="'TTL' | translate" [width]="'20%'" [value]="'ttl'">
+      </core-table-list-column>
+      <core-table-list-column [header]="'Type' | translate" [width]="'20%'">
+        <ng-template #bodyTemplate let-row="row" let-index="index">
+            <span>
+              {{ row.type === 'HOST' ? 'A (Host)' : row.type }}
+            </span>
+        </ng-template>
+      </core-table-list-column>
+      <core-table-list-column [header]="'Type specific data' | translate" [value]="'data'">
+      </core-table-list-column>
+    </core-table-list>
+    <div style="margin-top: 10px"></div>
+    <core-input-spinner class="pull-right" style="width: 150px" [value]="page"
+                        (valueChange)="onChangePage($event)"
+                        [disablePrev]="page === 1" [disableNext]="!canNext">
+    </core-input-spinner>
+    <div class="pull-left" style="line-height: 28px; font-style: italic; height: 28px;">
+      <span *ngIf="!shouldCache">{{ '(*) Note: Unsorted - use a Filter first' | translate }}</span>
+    </div>
+  </div>
+</div>

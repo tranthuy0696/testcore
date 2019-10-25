@@ -1,0 +1,7 @@
+<div class="select-spinner">
+  <button [attr.auto-tag]="BackButtonAutoTagName" type="button" class="button" [disabled]="value === min || disabled" (click)="decreaseValue()"><i class="icon-arrow_back"></i></button>
+  <select [attr.auto-tag]="SelectBoxAutoTagName" class="select" [(ngModel)]="value" (ngModelChange)="onValueChange($event)" [disabled]="disabled">
+    <option *ngFor="let value of values" [value]="value">{{ labels[value] || value }}</option>
+  </select>
+  <button [attr.auto-tag]="NextButtonAutoTagName" type="button" class="button" [disabled]="value === max || disabled" (click)="increaseValue()"><i class="icon-arrow_forward"></i></button>
+</div>

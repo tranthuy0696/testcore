@@ -1,0 +1,13 @@
+<div class="panel">
+  <div *ngIf="canCollapse" class="panel-header">
+    <label (click)="collapsed = !collapsed">{{ legend }}</label>
+    <core-collapse-toggle [(ngModel)]="collapsed"></core-collapse-toggle>
+  </div>
+  <div *ngIf="!canCollapse" class="panel-header">
+    <label>{{ legend }}</label>
+  </div>
+  <div class="panel-body" [hidden]="collapsed">
+    <ng-container *ngIf="!bodyTemplate"></ng-container>
+    <ng-template *ngIf="bodyTemplate" [ngTemplateOutlet]="bodyTemplate"></ng-template>
+  </div>
+</div>

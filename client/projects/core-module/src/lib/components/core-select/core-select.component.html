@@ -1,0 +1,21 @@
+<div class="core-select">
+  <div class="input select-input">
+    <input type="text"
+      [placeholder]="placeholder"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      [(ngModel)]="text"
+      (input)="input()"
+      [disabled]="disabled"
+      [attr.auto-tag]="autoTag">
+    <span>
+      <core-loader [attr.auto-tag]="'list-data-loading'" [show]="loading"></core-loader>
+    </span>
+  </div>
+  <ul [attr.auto-tag]="'list-data'" class="select-dropdown" [hidden]="loading || !showingList" [class]="position" [ngClass]="{'fixed': fixedDropdown}" #dropdown>
+    <li *ngFor="let item of cloneItems" (click)="select(item)">
+      <i class="icon-check" *ngIf="isSelected(item)"></i>
+      <span>{{ display(item) }}</span>
+    </li>
+  </ul>
+</div>

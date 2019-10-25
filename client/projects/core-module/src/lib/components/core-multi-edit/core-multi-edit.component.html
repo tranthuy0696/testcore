@@ -1,0 +1,7 @@
+<div class="input-box">
+  <div class="selected-items">
+    <div class="selected-item" *ngFor="let item of getItems(); let index = index">
+      <input type="text" [value]="item" (keyup.enter)="updateValue(index, $event)" (focusout)="updateValue(index, $event)">
+    </div>
+  </div>
+</div>

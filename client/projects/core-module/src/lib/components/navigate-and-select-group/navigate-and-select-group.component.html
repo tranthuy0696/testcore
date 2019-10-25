@@ -1,0 +1,109 @@
+<div [hidden]="collapsed">
+  <div class="row" style="line-height: 28px">
+    <div class="col-2">
+      <label>{{ 'Jump to GROUP' | translate:term }}</label>
+    </div>
+    <search-group (searchstart)="onSearchStart()" (searchend)="onSearchEnd($event)"></search-group>
+  </div>
+  <div class="row">
+    <div class="col-6 field mandatory">
+      <label>{{ 'Select Parent GROUP' | translate:term }}</label>
+      <core-table-list
+        auto-tag="select-parent-group-container"
+        [style]="display === 'compact' ? ['hml'] : ['hm']" [data]="data.leftTableData"
+        (cellClick)="onLeftTableCellClick($event)" [highlightRowFunc]="highlightRowFunc"
+        [loading]="loadingLeftTable"
+        [placeholder]="'No GROUPs Found' | translate:term"
+        [showPlaceholder]="data.leftTableData.length === 0"
+        #leftTable>
+        <core-table-list-column [header]="'Selected' | translate"
+                                [width]="'30px'">
+          <ng-template #headerTemplate>
+            <span></span>
+          </ng-template>
+          <ng-template #bodyTemplate let-row="row" let-index="index">
+            <span class="table-cell-radio table-cell-clickable">
+              <input type="radio" name="tableSelection" [checked]="row.selected" (change)="selectGroup(row)">
+            </span>
+          </ng-template>
+        </core-table-list-column>
+        <core-table-list-column [header]="'GROUP' | translate:term"
+                                auto-tag="parent-group-table_ipam-column">
+          <ng-template #bodyTemplate let-row="row">
+            <span class="table-cell-ipam table-cell-clickable">
+              <i class="icon-tag"></i>
+              <span><a (click)="openGroup(row, $event)">{{ row.name }}</a></span>
+            </span>
+          </ng-template>
+        </core-table-list-column>
+      </core-table-list>
+      <div class="table-list-toolbar">
+        <button class="button icon-button" [disabled]="!data.current" (click)="goUp()"><i class="icon-arrow-up"></i></button>
+        <core-select-spinner
+          [min]="0"
+          [max]="leftTableMaxIndex"
+          [(value)]="leftTableIndex"
+          (valueChange)="onLeftTablePageChange()"
+          [labels]="leftTableIndexLabels"
+          [disabled]="leftTablePageDisabled">
+        </core-select-spinner>
+      </div>
+    </div>
+    <div class="col-6 field">
+      <label>{{ 'Child GROUPs' | translate:term }}</label>
+      <core-table-list [style]="display === 'compact' ? ['hml'] : ['hm']"
+                       [data]="data.rightTableData"
+                       [loading]="loadingRightTable"
+                       [placeholder]="'No GROUPs Found' | translate:term"
+                       [showPlaceholder]="data.group && data.rightTableData.length === 0"
+                       auto-tag="existing-children-of-selected-group-container"
+                       (cellClick)="onRightTableCellClick($event)"
+                       auto-tag="existing-children-of-selected-group-container">
+        <core-table-list-column [header]="'GROUP' | translate:term" [width]="'40%'"
+                                auto-tag="existing-children-table_ipam-column">
+          <ng-template #bodyTemplate let-row="row">
+            <span class="table-cell-ipam table-cell-clickable">
+              <i class="icon-tag"></i>
+              <span>{{ row.name }}</span>
+            </span>
+          </ng-template>
+        </core-table-list-column>
+      </core-table-list>
+      <div class="table-list-toolbar">
+        <core-select-spinner
+          [min]="0"
+          [max]="rightTableMaxIndex"
+          [(value)]="rightTableIndex"
+          (valueChange)="onRightTablePageChange()"
+          [labels]="rightTableIndexLabels"
+          [disabled]="rightTablePageDisabled">
+        </core-select-spinner>
+      </div>
+    </div>
+  </div>
+</div>
+<div [hidden]="display === 'compact'">
+  <core-collapse [(ngModel)]="collapsed"></core-collapse>
+  <div auto-tag="selected-parent-group" class="row">
+    <div class="col-12 field mandatory">
+      <div class="well">
+        <core-loader [show]="loadingWell"></core-loader>
+        <strong>{{ 'Selected Parent GROUP' | translate:term }}</strong>:
+        <span>
+            <ul class="breadcrumb" *ngIf="data.current">
+              <li *ngFor="let item of data.current.parents">
+                <a (click)="onSearchEnd({searchedResult: item})">{{item.name}}</a>
+              </li>
+              <li *ngIf="data.current && data.current.name"><a (click)="onSearchEnd({searchedResult: data.current})">{{data.current.name}}</a></li>
+              <li *ngIf="data.group">{{data.group.name}}</li>
+              <li *ngIf="!data.group">{{ NO_PARENT_SELECTED }}</li>
+            </ul>
+            <ul class="breadcrumb" *ngIf="!data.current">
+              <li *ngIf="data.group">{{data.group.name}}</li>
+              <li *ngIf="!data.group">{{ NO_PARENT_SELECTED }}</li>
+            </ul>
+          </span>
+      </div>
+    </div>
+  </div>
+</div>

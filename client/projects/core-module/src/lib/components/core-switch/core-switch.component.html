@@ -1,0 +1,7 @@
+<div class="switch" [ngClass] = "cssClass">
+  <input type="checkbox" [(ngModel)]="value" (ngModelChange)="onChange($event)">
+  <label  [attr.auto-tag]="autoTag" [ngClass]="{'toggle': true, 'active': value}" (click)="toggle()">
+    <span class="toggle-handler"></span>
+  </label>
+  <span class="label">{{ label }}</span>
+</div>

@@ -1,0 +1,29 @@
+<div class="markdown-editor flex-box flex-direction-vertical" [class.fullscreen]="isFullScreen">
+  <div class="toolbar">
+    <div class="group">
+      <button class="button" (click)="format('bold')"><i class="icon-format_bold"></i></button>
+      <button class="button" (click)="format('italic')"><i class="icon-format_italic"></i></button>
+      <button class="button" (click)="format('underlined')"><i class="icon-format_underlined"></i></button>
+    </div>
+    <!-- <div class="group">
+      <button><i class="icon-format_align_left"></i></button>
+      <button><i class="icon-format_align_center"></i></button>
+      <button><i class="icon-format_align_justify"></i></button>
+      <button><i class="icon-format_align_right"></i></button>
+    </div> -->
+    <div class="group">
+      <button class="button" (click)="format('heading')"><i class="icon-menu"></i></button>
+    </div>
+    <div class="group">
+      <button class="button" (click)="format('ul')"><i class="icon-format_list_bulleted"></i></button>
+      <button class="button" (click)="format('ol')"><i class="icon-format_list_numbered"></i></button>
+    </div>
+    <div class="group">
+      <button class="button" (click)="toggleMode()"><i class="icon-visibility"></i></button>
+    </div>
+  </div>
+  <div class="container flex-box flex-direction-horizontal flex-1-0-auto">
+    <textarea class="editor flex-1" #editor [(ngModel)]="value" [hidden]="mode !== 'edit' && mode !== 'dual'" [attr.maxlength]="maxLength"></textarea>
+    <div class="preview flex-1" [innerHTML]="getPreviewValue()" *ngIf="mode === 'preview' || mode === 'dual'"></div>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+<div class="col-9 field">
+  <core-select
+    [autoTagName]="'search-group'"
+    [items]="items"
+    [(ngModel)]="item"
+    (search)="instantSearch($event)"
+    [loading]="searching"
+    [textFields]="['fullName']"
+    placeholder="Planet Earth"
+    (selected) = "onSelected()"
+    #select>
+  </core-select>
+  <span *ngIf="hasError" [ngClass]="{'invalid': hasError}">
+    <p> {{ 'GROUP does not exist' | translate:term }} </p>
+  </span>
+</div>
+<div class="col-1">
+  <button auto-tag="jump-to-group" class="button full-width background-secondary" [disabled]="!goable()" (click)="search()">
+    {{ 'Go' | translate }}
+  </button>
+</div>

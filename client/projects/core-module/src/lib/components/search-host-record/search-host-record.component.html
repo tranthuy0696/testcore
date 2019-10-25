@@ -1,0 +1,17 @@
+<div class="field">
+  <core-select
+    [autoTagName]="'hostname'"
+    [items]="items"
+    [(ngModel)]="item"
+    (search)="instantSearch($event)"
+    [loading]="searching"
+    [textFields]="['fqdn']"
+    (blur)="onBlur()"
+    (selected)="onSelected()"
+    [ngClass]="{'invalid': invalid || hasError, 'valid': valid}"
+    #selectFqdn>
+  </core-select>
+  <span *ngIf="hasError" [ngClass]="{'invalid': hasError}">
+    <p auto-tag="target-hostname-does-not-exist"> {{ errorMessage | translate:term }} </p>
+  </span>
+</div>

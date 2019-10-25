@@ -1,0 +1,56 @@
+<div class="col-3">
+  <select auto-tag="search-options" class="select" [(ngModel)]="searchBy" (ngModelChange)="onSearchByChange()">
+    <option auto-tag="subnet-option" [value]="SEARCH_BY_SUBNET">{{ 'Jump to SUBNET' | translate:term }}</option>
+    <option auto-tag="fqdn-option" [value]="SEARCH_BY_FQDN" [hidden]="mode === MODE_SELECT_SUBNET_SELECTABLE_ADDRESS">{{ 'Search by FQDN' | translate }}</option>
+    <option auto-tag="ip-option" [value]="SEARCH_BY_IP" *ngIf="mode === MODE_SELECT_SUBNET_TO_SELECT_ADDRESS || mode === MODE_SELECT_SUBNET_SELECTABLE_ADDRESS">
+      {{ 'Search by IP' | translate }}
+    </option>
+  </select>
+</div>
+<div class="col-8 field">
+  <core-select
+    [hidden]="searchBy !== SEARCH_BY_SUBNET"
+    [items]="searchedSubnets"
+    [(ngModel)]="searchedSubnet"
+    [ngModelOptions]="{standalone: true}"
+    (search)="instantSearch($event)"
+    (selected)="onSelected()"
+    [loading]="searching"
+    [textFields]="['CIDR', 'name']"
+    placeholder="4.2.8.0/24"
+    [autoTagName]="'search-by-subnet'"
+    #searchBySubnet>
+  </core-select>
+  <core-select
+    [hidden]="searchBy !== SEARCH_BY_FQDN"
+    [items]="searchedHostRecords"
+    [(ngModel)]="searchedHostRecord"
+    [ngModelOptions]="{standalone: true}"
+    (search)="instantSearch($event)"
+    (selected)="onSelected()"
+    [loading]="searching"
+    [textFields]="['fqdn']"
+    placeholder="zaphod.mostlyharmless.tld"
+    [autoTagName]="'search-by-fqdn'"
+    #searchByFQDN>
+  </core-select>
+  <core-select
+    [hidden]="searchBy !== SEARCH_BY_IP"
+    (search)="instantSearch($event)"
+    (valueChange)="valueChange()"
+    [loading]="searching"
+    placeholder="4.2.8.8"
+    [autoTagName]="'search-subnet-by-ip'"
+    #searchByIp>
+  </core-select>
+  <span *ngIf="hasError" [ngClass]="{'invalid': hasError}">
+    <p *ngIf="searchBy === SEARCH_BY_SUBNET"> {{ 'SUBNET does not exist' | translate:term }} </p>
+    <p *ngIf="searchBy === SEARCH_BY_FQDN"> {{ 'FQDN does not exist' | translate:term }} </p>
+    <p *ngIf="searchBy === SEARCH_BY_IP"> {{ 'Ip does not exist' | translate:term }} </p>
+  </span>
+</div>
+<div class="col-1">
+  <button auto-tag="jump-to-subnet" class="button full-width background-secondary" [disabled]="!goable()" (click)="search()">
+    {{ 'Go' | translate }}
+  </button>
+</div>

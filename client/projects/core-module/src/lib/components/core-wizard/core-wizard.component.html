@@ -1,0 +1,33 @@
+<core-modal id="wizard-container">
+  <core-loader [show]="loading"></core-loader>
+  <div *ngFor="let screen of screens" class="card" [id]="screen.name" [ngClass]="{'hidden': !screen.visible}">
+    <div class="card-header">
+      <ng-container *ngIf="!screen.headerTemplate">
+        {{ screen.title || title }}
+      </ng-container>
+      <ng-template *ngIf="screen.headerTemplate" [ngTemplateOutlet]="screen.headerTemplate"></ng-template>
+    </div>
+    <ng-container *ngIf="!screen.bodyAndFooterTemplate">
+      <div class="card-body">
+        <ng-container *ngIf="!screen.bodyTemplate"></ng-container>
+        <ng-template *ngIf="screen.bodyTemplate" [ngTemplateOutlet]="screen.bodyTemplate"></ng-template>
+      </div>
+      <div class="card-footer">
+        <ng-container *ngIf="!screen.footerTemplate">
+          <button [id]="screen.name + '-cancel-button'" (click)="screen.cancel.emit()" [disabled]="!screen.canCancel" *ngIf="screen.showCancel" class="button background-secondary">{{ 'Cancel' | translate }}</button>
+          <button [id]="screen.name + '-submit-button'" (click)="screen.submit.emit()" [disabled]="!screen.canSubmit" *ngIf="screen.showSubmit" class="button right background-green">
+            {{ 'Submit' | translate }}
+          </button>
+          <button [id]="screen.name + '-next-button'" (click)="screen.next.emit()" [disabled]="!screen.canNext" *ngIf="screen.showNext" class="button right background-secondary">
+            {{ 'Next' | translate }}
+          </button>
+          <button [id]="screen.name + '-back-button'" (click)="screen.previous.emit()" [disabled]="!screen.canPrevious" [hidden]="!screen.showPrevious" class="button right background-secondary">{{ 'Back' | translate }}</button>
+          <div class="card-footer-message" *ngIf="screen.validating" >{{ 'Checking ...' | translate }}</div>
+        </ng-container>
+        <ng-template *ngIf="screen.footerTemplate" [ngTemplateOutlet]="screen.footerTemplate">
+        </ng-template>
+      </div>
+    </ng-container>
+    <ng-template *ngIf="screen.bodyAndFooterTemplate" [ngTemplateOutlet]="screen.bodyAndFooterTemplate"></ng-template>
+  </div>  
+</core-modal>

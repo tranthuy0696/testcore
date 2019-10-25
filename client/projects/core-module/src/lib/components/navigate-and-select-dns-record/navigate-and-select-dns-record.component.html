@@ -1,0 +1,20 @@
+<div class="row">
+  <div class="col-12">
+    <core-table-list
+      [style]="classes"
+      [data]="data"
+      [loading]="loading"
+      [placeholder]="placeholder"
+      [showPlaceholder]="showPlaceholder"
+      [attr.auto-tag]="autoTag">
+      <core-table-list-column [header]="'FQDN' | translate" [width]="'30%'" [value]="'fqdn'">
+      </core-table-list-column>
+      <core-table-list-column [header]="'TTL' | translate" [width]="'20%'" [value]="'ttl'">
+      </core-table-list-column>
+      <core-table-list-column [header]="'Type' | translate" [width]="'20%'" [value]="'type'">
+      </core-table-list-column>
+      <core-table-list-column [header]="'RDATA' | translate" [width]="'30%'" [value]="'data'">
+      </core-table-list-column>
+    </core-table-list>
+  </div>
+</div>

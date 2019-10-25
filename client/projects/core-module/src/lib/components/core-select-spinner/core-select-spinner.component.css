@@ -1,0 +1,16 @@
+select {
+  margin: 0 4px;
+  width: calc(100% - 64px);
+  float: left;
+}
+select:hover {
+  background: #fff;
+}
+button {
+  margin: 0;
+  padding: 0;
+  height: 28px;
+  width: 28px;
+  line-height: 28px;
+  float: left;
+}

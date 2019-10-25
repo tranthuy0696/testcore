@@ -1,0 +1,9 @@
+{
+  "name": "@pcn-core/core-module",
+  "version": "3.0.0",
+  "license": "Copyright 2019 PC Network Inc",
+  "peerDependencies": {
+    "@angular/common": "8.0.3",
+    "@angular/core": "8.0.3"
+  }
+}

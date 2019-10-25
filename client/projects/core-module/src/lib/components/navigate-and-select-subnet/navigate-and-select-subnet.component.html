@@ -1,0 +1,376 @@
+<div [hidden]="collapsed">
+  <div class="row">
+    <search-subnet
+    (searchstart)="onSearchStart()"
+    (searchend)="onSearchEnd($event)"
+    [mode]="mode"
+    [searchedResult]="searchedResult"
+    #searchSubnet>
+    </search-subnet>
+  </div>
+  <div class="row">
+    <div
+      [ngClass]="{'col-6': mode !== MODE_SELECT_SUBNET_TO_ACTIVATE, 'col-12': mode === MODE_SELECT_SUBNET_TO_ACTIVATE, 'field': true, 'mandatory': true}">
+      <label *ngIf="mode === MODE_SELECT_SUBNET || mode === MODE_SELECT_SUBNET_TO_SELECT_ADDRESS || mode === MODE_SELECT_SUBNET_SELECTABLE_ADDRESS">
+        {{ 'Select Parent' | translate }}
+      </label>
+      <label *ngIf="mode !== MODE_SELECT_SUBNET && mode !== MODE_SELECT_SUBNET_TO_SELECT_ADDRESS && mode !== MODE_SELECT_SUBNET_SELECTABLE_ADDRESS">
+        {{ 'Select SUBNET' | translate:term }}
+      </label>
+      <core-table-list
+        auto-tag="select-parent-subnet-container"
+        [style]="classes"
+        [data]="data.leftTableData"
+        [highlightRowFunc]="highlightRowFunc"
+        (cellClick)="onLeftTableCellClick($event)"
+        [loading]="loadingLeftTable"
+        [placeholder]="'No NETWORKs or SUBNETs Found' | translate:term"
+        [showPlaceholder]="data.leftTableData.length === 0"
+        #leftTable>
+        <core-table-list-column [header]="'Selected'" [width]="'30px'">
+          <ng-template #headerTemplate>
+            <span></span>
+          </ng-template>
+          <ng-template #bodyTemplate let-row="row" let-index="index">
+            <span *ngIf="row.type === SUBNET" class="table-cell-radio table-cell-clickable">
+              <input type="radio" name="tableSelection" [checked]="row.selected" (change)="changeSubnet(row)">
+            </span>
+          </ng-template>
+        </core-table-list-column>
+        <core-table-list-column [header]="'IPAM'" [width]="'150px'">
+          <ng-template #bodyTemplate let-row="row">
+            <span *ngIf="row.type === NETWORK" class="table-cell-ipam">
+              <i class="icon-folder"></i>
+              <span><a (click)="openNetwork(row)">{{ row.CIDR }}</a></span>
+            </span>
+            <span *ngIf="row.type === SUBNET" class="table-cell-ipam table-cell-clickable">
+              <i class="icon-sitemap"></i>
+              <span>{{ row.CIDR }}</span>
+            </span>
+          </ng-template>
+        </core-table-list-column>
+        <core-table-list-column [header]="'Name'">
+          <ng-template #bodyTemplate let-row="row">
+            <span [ngClass]="{'table-cell-clickable': row.type === SUBNET}">
+              {{ row.name }}
+            </span>
+          </ng-template>
+        </core-table-list-column>
+      </core-table-list>
+      <div style="margin-top: 10px"></div>
+      <button class="button icon-button" [disabled]="!data.current" (click)="back()"><i class="icon-arrow-up"></i></button>
+    </div>
+    <div class="col-6 field"
+        *ngIf="mode === MODE_SELECT_SUBNET
+          || mode === MODE_SELECT_SUBNET_TO_SPLIT
+          || mode === MODE_SELECT_SUBNET_TO_SELECT_ADDRESS">
+      <label>{{ 'IP Addresses' | translate }}</label>
+      <core-table-list
+        [style]="classes"
+        [data]="data.rightTableData"
+        [loading]="loadingRightTable"
+        (cellClick)="onRightTableCellClick($event)"
+        auto-tag="existing-children-of-selected-subnet-container">
+        <core-table-list-column [header]="'IPAM' | translate">
+          <ng-template #bodyTemplate let-row="row">
+            <span class="table-cell-ipam"
+              [ngClass]="{'color-green': row.state === AVAILABLE, 'color-red': row.state !== AVAILABLE, 'table-cell-clickable': true}">
+              <i class="icon-location-o" *ngIf="row.state === AVAILABLE"></i>
+              <i class="icon-location" *ngIf="row.state === 'GATEWAY' || row.state === 'STATIC'"></i>
+              <i class="icon-dice" *ngIf="row.state === 'DHCP'"></i>
+              <i class="icon-pushpin" *ngIf="row.state === 'DHCP_RESERVED'"></i>
+              <span>{{ row.ip }}</span>
+            </span>
+          </ng-template>
+        </core-table-list-column>
+        <core-table-list-column [value]="'state'" [header]="'Status' | translate">
+          <ng-template #bodyTemplate let-row="row">
+            <span class="table-cell-clickable">{{ displayState(row) }}</span>
+          </ng-template>
+        </core-table-list-column>
+      </core-table-list>
+      <div style="margin-top: 10px"></div>
+      <core-select-spinner [SelectBoxAutoTagName]="'dhcp-range-existing'" [NextButtonAutoTagName]="'next-button'" [min]="0" [max]="pageList.length - 1" [(value)]="selectedPage" [labels]="labels"
+                           (valueChange)="onPageChange($event)" [disabled]="isPageDisabled"></core-select-spinner>
+    </div>
+    <div class="col-6 field" *ngIf="mode === MODE_SELECT_SUBNET_SELECTABLE_ADDRESS">
+      <label>{{ 'IP Addresses' | translate }}</label>
+      <core-table-list
+        [style]="classes"
+        [data]="data.rightTableData"
+        [loading]="loadingRightTable"
+        [highlightRowFunc]="highlightRowFunc"
+        (cellClick)="onRightTableClick($event)">
+        <core-table-list-column [header]="'Selected'" [width]="'30px'">
+          <ng-template #headerTemplate>
+            <span></span>
+          </ng-template>
+          <ng-template #bodyTemplate let-row="row" let-index="index">
+            <span *ngIf="row.state !== 'Available'" class="table-cell-radio table-cell-clickable">
+              <input type="radio" name="tableSelection" [checked]="row.selected">
+            </span>
+          </ng-template>
+        </core-table-list-column>
+        <core-table-list-column [header]="'IPAM' | translate">
+          <ng-template #bodyTemplate let-row="row">
+            <span class="table-cell-ipam"
+              [ngClass]="{'color-green': row.state === AVAILABLE, 'color-red': row.state !== AVAILABLE, 'table-cell-clickable': row.state !== AVAILABLE}">
+              <i class="icon-location-o" *ngIf="row.state === AVAILABLE"></i>
+              <i class="icon-location" *ngIf="row.state === 'GATEWAY' || row.state === 'STATIC'"></i>
+              <i class="icon-dice" *ngIf="row.state === 'DHCP'"></i>
+              <i class="icon-pushpin" *ngIf="row.state === 'DHCP_RESERVED'"></i>
+              <span>{{ row.ip }}</span>
+            </span>
+          </ng-template>
+        </core-table-list-column>
+        <core-table-list-column [header]="'Status' | translate">
+          <ng-template #bodyTemplate let-row="row">
+            <span [ngClass]="{'table-cell-clickable': row.state !== AVAILABLE}">
+              {{ displayState(row) }}
+            </span>
+          </ng-template>
+        </core-table-list-column>
+      </core-table-list>
+      <div style="margin-top: 10px"></div>
+      <core-select-spinner [min]="0" [max]="pageList.length - 1" [(value)]="selectedPage" [labels]="labels"
+                            (valueChange)="onPageChange($event)" [disabled]="isPageDisabled"></core-select-spinner>
+    </div>
+    <div class="col-6 field" *ngIf="mode === MODE_SELECT_SUBNETS_TO_JOIN">
+      <label>{{ 'Possible Joins' | translate }}</label>
+      <core-table-list
+        [autoTagName]="'possible-join-subnet-container'"
+        [style]="classes"
+        [data]="data.rightTableData"
+        [loading]="loadingRightTable"
+        (cellClick)="onRightTableClick($event)"
+        [highlightRowFunc]="highlightRowFunc"
+        [placeholder]="'No SUBNETs Found' | translate:term"
+        [showPlaceholder]="data.net1 && data.rightTableData.length === 0">
+        <core-table-list-column [header]="'IPAM' | translate">
+          <ng-template #bodyTemplate let-row="row">
+            <span class="table-cell-ipam table-cell-clickable">
+              <i class="icon-sitemap"></i>
+              <span>{{ row.CIDR }}</span>
+            </span>
+          </ng-template>
+        </core-table-list-column>
+        <core-table-list-column [header]="'Status' | translate">
+          <ng-template #bodyTemplate>
+            <span class="table-cell-clickable">{{ 'Reserved' | translate }}</span>
+          </ng-template>
+        </core-table-list-column>
+      </core-table-list>
+    </div>
+    <div class="col-6 field" *ngIf="mode === MODE_SELECT_SUBNET_TO_MODIFY_DHCP_SERVICE">
+      <label>{{ 'Existing DHCP_SCOPEs' | translate:term }}</label>
+      <core-table-list [style]="classes" [data]="data.rightTableData" [loading]="loadingRightTable"
+                       [placeholder]="'No DHCP_SCOPEs Found' | translate:term"
+                       [showPlaceholder]="data.net && data.rightTableData.length === 0"
+                       auto-tag="existing-dhcp-scope-container">
+        <core-table-list-column [value]="'start'" [header]="'Start' | translate"></core-table-list-column>
+        <core-table-list-column [value]="'end'" [header]="'End' | translate"></core-table-list-column>
+      </core-table-list>
+    </div>
+  </div>
+</div>
+<core-collapse [(ngModel)]="collapsed" *ngIf="mode !== MODE_SELECT_SUBNET_TO_SELECT_ADDRESS && mode !== MODE_SELECT_SUBNET_SELECTABLE_ADDRESS"></core-collapse>
+<div class="row" *ngIf="mode === MODE_SELECT_SUBNET">
+  <div class="col-12 field">
+    <div auto-tag="selected-parent" class="well" [ngClass]="{'invalid': data.net && (!data.net.accessible || !data.net.isActive)}">
+      <core-loader [show]="loadingNet"></core-loader>
+      <strong>{{ 'Selected Parent Path' | translate }}</strong>:
+      <span auto-tag="selected-parent-path">
+        <ul class="breadcrumb" *ngIf="data.current">
+          <li *ngFor="let item of data.current.parents">
+            <a (click)="openNetwork(item)">{{item.CIDR}}</a>
+          </li>
+          <li *ngIf="data.current && data.current.CIDR"><a (click)="openNetwork(data.current)">{{data.current.CIDR}}</a></li>
+          <li *ngIf="data.net">{{data.net.CIDR}}</li>
+          <li *ngIf="!data.net">{{'Not Selected' | translate}}</li>
+        </ul>
+        <ul class="breadcrumb" *ngIf="!data.current">
+          <li *ngIf="data.net">{{data.net.CIDR}}</li>
+          <li *ngIf="!data.net">{{'Not Selected' | translate}}</li>
+        </ul>
+      </span>
+      <br>
+      <strong>{{ 'Parent' | translate }} {{ 'GROUP' | translate:term }}s</strong>: <span auto-tag="selected-parent-group">{{ displayGroups(data.net) }}</span>
+      <div *ngIf="showDhcpService"><strong>{{ 'DHCP Service' | translate }}</strong>: <span
+        [ngClass]="{ 'invalid': !data.net || !data.net.dhcpService }">{{ displayDhcpService(data.net) }}</span>
+      </div>
+    </div>
+    <span class="message-block" *ngIf="data.net && (!data.net.accessible || !data.net.isActive)">
+      <p *ngIf="!data.net.accessible">{{ 'You do not have write access on this SUBNET' | translate:term }}</p>
+      <p *ngIf="!data.net.isActive">{{ 'SUBNET is reserved and must be activated before continuing' | translate:term }}</p>
+    </span>
+  </div>
+</div>
+<div class="row" *ngIf="mode === MODE_SELECT_SUBNET_SELECTABLE_ADDRESS">
+    <div class="col-12 field">
+      <div class="well">
+        <core-loader [show]="loadingNet"></core-loader>
+        <strong>{{ 'Selected Parent Path' | translate }}</strong>:
+        <span>
+          <ul class="breadcrumb" *ngIf="data.current">
+            <li *ngFor="let item of data.current.parents">
+              <a (click)="openNetwork(item)">{{item.CIDR}}</a>
+            </li>
+            <li *ngIf="data.current && data.current.CIDR"><a (click)="openNetwork(data.current)">{{data.current.CIDR}}</a></li>
+            <li *ngIf="data.net">{{data.net.CIDR}}</li>
+            <li *ngIf="!data.net">{{'Not Selected' | translate}}</li>
+          </ul>
+          <ul class="breadcrumb" *ngIf="!data.current">
+            <li *ngIf="data.net">{{data.net.CIDR}}</li>
+            <li *ngIf="!data.net">{{'Not Selected' | translate}}</li>
+          </ul>
+        </span>
+      </div>
+    </div>
+  </div>
+<div class="row" *ngIf="mode === MODE_SELECT_SUBNET_TO_ACTIVATE">
+  <div class="col-12 field">
+    <div class="well" [ngClass]="{'invalid': data.net && (!data.net.accessible || data.net.isActive)}">
+      <core-loader [show]="loadingNet"></core-loader>
+      <strong>{{ 'Selected Parent Path' | translate }}</strong>:
+      <span auto-tag="selected-parent-path">
+        <ul class="breadcrumb" *ngIf="data.current">
+          <li *ngFor="let item of data.current.parents">
+            <a (click)="openNetwork(item)">{{item.CIDR}}</a>
+          </li>
+          <li *ngIf="data.current && data.current.CIDR"><a (click)="openNetwork(data.current)">{{data.current.CIDR}}</a></li>
+          <li *ngIf="data.net">{{data.net.CIDR}}</li>
+          <li *ngIf="!data.net">{{'Not Selected' | translate}}</li>
+        </ul>
+        <ul class="breadcrumb" *ngIf="!data.current">
+          <li *ngIf="data.net">{{data.net.CIDR}}</li>
+          <li *ngIf="!data.net">{{'Not Selected' | translate}}</li>
+        </ul>
+      </span>
+      <br>
+      <strong>{{ 'SUBNET' | translate:term }} {{ 'GROUP' | translate:term }}s</strong>: <span auto-tag="subnet-group">{{ displayGroups(data.net) }}</span>
+    </div>
+    <span class="message-block" *ngIf="data.net && (!data.net.accessible || data.net.isActive)">
+      <p *ngIf="!data.net.accessible">{{ 'You do not have write access on this SUBNET' | translate:term }}</p>
+      <p auto-tag="subnet-must-be-reserved" *ngIf="data.net.isActive">{{ 'SUBNET must be reserved' | translate:term }}</p>
+    </span>
+  </div>
+</div>
+<div class="row" *ngIf="mode === MODE_SELECT_SUBNET_TO_SPLIT">
+  <div class="col-12 field">
+    <div class="well" [ngClass]="{'invalid': data.net && (!data.net.accessible || data.net.isActive)}">
+      <core-loader [show]="loadingNet"></core-loader>
+      <strong>{{ 'Selected SUBNET' | translate:term }}</strong>:
+      <span auto-tag="selected-subnet">
+        <ul class="breadcrumb" *ngIf="data.current">
+          <li *ngFor="let item of data.current.parents">
+            <a (click)="openNetwork(item)">{{item.CIDR}}</a>
+          </li>
+          <li *ngIf="data.current && data.current.CIDR"><a (click)="openNetwork(data.current)">{{data.current.CIDR}}</a></li>
+          <li *ngIf="data.net">{{data.net.CIDR}}</li>
+          <li *ngIf="!data.net">{{'Not Selected' | translate}}</li>
+        </ul>
+        <ul class="breadcrumb" *ngIf="!data.current">
+          <li *ngIf="data.net">{{data.net.CIDR}}</li>
+          <li *ngIf="!data.net">{{'Not Selected' | translate}}</li>
+        </ul>
+      </span>
+      <br>
+      <strong>{{ 'SUBNET' | translate:term }} {{ 'GROUP' | translate:term }}s</strong>: <span auto-tag="subnet-group">{{ displayGroups(data.net) }}</span>
+      <br>
+      <strong>{{ 'Original GATEWAY' | translate:term }}</strong>: <span auto-tag="sub-gateway">{{ displayGateway(data.net) }}</span>
+    </div>
+    <span class="message-block" *ngIf="data.net && (!data.net.accessible || data.net.isActive)">
+      <p *ngIf="!data.net.accessible">{{ 'You do not have write access on this SUBNET' | translate:term }}</p>
+      <p *ngIf="data.net.isActive">{{ 'SUBNET must be reserved to be split' | translate:term }}</p>
+    </span>
+  </div>
+</div>
+<div *ngIf="mode === MODE_SELECT_SUBNETS_TO_JOIN">
+  <div class="row">
+    <div class="col-12 field">
+      <div class="well">
+        <core-loader [show]="loadingNet1"></core-loader>
+        <strong>{{ 'Selected Parent Path' | translate }}</strong>:
+        <span auto-tag="selected-parent-path">
+          <ul class="breadcrumb" *ngIf="data.current">
+            <li *ngFor="let item of data.current.parents">
+              <a (click)="openNetwork(item)">{{item.CIDR}}</a>
+            </li>
+            <li *ngIf="data.current && data.current.CIDR"><a (click)="openNetwork(data.current)">{{data.current.CIDR}}</a></li>
+            <li *ngIf="data.net">{{data.net.CIDR}}</li>
+            <li *ngIf="!data.net">{{'Not Selected' | translate}}</li>
+          </ul>
+          <ul class="breadcrumb" *ngIf="!data.current">
+            <li *ngIf="data.net">{{data.net.CIDR}}</li>
+            <li *ngIf="!data.net">{{'Not Selected' | translate}}</li>
+          </ul>
+        </span>
+        <br>
+        <strong>{{ 'SUBNET' | translate:term }} {{ 'GROUP' | translate:term }}s</strong>: <span auto-tag="subnet-group">{{ displayGroups(data.net1) }}</span>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-6 field">
+      <div class="well" [ngClass]="{'invalid': data.net1 && (!data.net1.accessible || !data.net1.isActive)}">
+        <core-loader [show]="loadingNet1"></core-loader>
+        <strong>{{ 'SUBNET' | translate }} 1</strong>: <span [ngClass]="{ 'invalid': !data.net1 }">{{ displayCidr(data.net1) }}</span>
+        <br>
+        <strong>{{ 'GATEWAY' | translate }} 1</strong>: <span [ngClass]="{ 'invalid': !data.net1 }">{{ displayGateway(data.net1) }}</span>
+        <br>
+        <strong>{{ 'Name 1' | translate }}</strong>: <span [ngClass]="{ 'invalid': !data.net1 }">{{ displayName(data.net1) }}</span>
+      </div>
+      <span class="message-block" *ngIf="data.net1 && (!data.net1.accessible || !data.net1.isActive)">
+        <p *ngIf="!data.net1.accessible">{{ 'You do not have write access on this SUBNET' | translate:term }}</p>
+        <p *ngIf="!data.net1.isActive">{{ 'SUBNET must be reserved to be joined' | translate:term }}</p>
+      </span>
+    </div>
+    <div class="col-6 field">
+      <div class="well" [ngClass]="{'invalid': data.net2 && (!data.net2.accessible || !data.net2.isActive)}">
+        <core-loader [show]="loadingNet2"></core-loader>
+        <strong>{{ 'SUBNET' | translate }} 2</strong>: <span [ngClass]="{ 'invalid': !data.net2 }">{{ displayCidr(data.net2) }}</span>
+        <br>
+        <strong>{{ 'GATEWAY' | translate }} 2</strong>: <span [ngClass]="{ 'invalid': !data.net2 }">{{ displayGateway(data.net2) }}</span>
+        <br>
+        <strong>{{ 'Name 2' | translate }}</strong>: <span [ngClass]="{ 'invalid': !data.net2 }">{{ displayName(data.net2) }}</span>
+      </div>
+      <span class="message-block" *ngIf="data.net2 && (!data.net2.accessible || !data.net2.isActive)">
+        <p *ngIf="!data.net2.accessible">{{ 'You do not have write access on this SUBNET' | translate:term }}</p>
+        <p *ngIf="!data.net2.isActive">{{ 'SUBNET must be reserved to be joined' | translate:term }}</p>
+      </span>
+    </div>
+  </div>
+</div>
+<div class="row" *ngIf="mode === MODE_SELECT_SUBNET_TO_MODIFY_DHCP_SERVICE">
+  <div class="col-12 field">
+    <div class="well"
+         [ngClass]="{'invalid': data.net && (!data.net.accessible || !data.net.isActive || (data.net.dhcpService && data.net.dhcpService.type === 'NONE'))}">
+      <core-loader [show]="loadingNet"></core-loader>
+      <strong>{{ 'Selected SUBNET Path' | translate:term }}</strong>:
+      <span auto-tag="selected-parent-path">
+        <ul class="breadcrumb" *ngIf="data.current">
+          <li *ngFor="let item of data.current.parents">
+            <a (click)="openNetwork(item)">{{item.CIDR}}</a>
+          </li>
+          <li *ngIf="data.current && data.current.CIDR"><a (click)="openNetwork(data.current)">{{data.current.CIDR}}</a></li>
+          <li *ngIf="data.net">{{data.net.CIDR}}</li>
+          <li *ngIf="!data.net">{{'Not Selected' | translate}}</li>
+        </ul>
+        <ul class="breadcrumb" *ngIf="!data.current">
+          <li *ngIf="data.net">{{data.net.CIDR}}</li>
+          <li *ngIf="!data.net">{{'Not Selected' | translate}}</li>
+        </ul>
+      </span>
+      <br>
+      <strong>{{ 'SUBNET' | translate:term }} {{ 'GROUP' | translate:term }}s</strong>: <span auto-tag="subnet-group">{{ displayGroups(data.net) }}</span>
+      <br>
+    </div>
+    <span
+      *ngIf="data.net && (!data.net.accessible || !data.net.isActive || (data.net.dhcpService && data.net.dhcpService.type === 'NONE'))">
+      <p *ngIf="!data.net.accessible && data.net.isActive">{{ 'You do not have write access on this SUBNET' | translate:term }}</p>
+      <p *ngIf="!data.net.isActive && data.net.accessible">{{ 'Modifying DHCP service is not allowed because this SUBNET is reserved' | translate:term }}</p>
+      <p *ngIf="!data.net.isActive && !data.net.accessible">{{ 'SUBNET is reserved | You do not have access to this SUBNET' | translate:term }}</p>
+      <p *ngIf="data.net.dhcpService && data.net.dhcpService.type === 'NONE'">{{ 'SUBNET contains DHCP service with type NONE' | translate:term }}</p>
+    </span>
+  </div>
+</div>

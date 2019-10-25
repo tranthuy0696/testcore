@@ -1,0 +1,9 @@
+{
+  "type": "self-service",
+  "name": "add-child-zone12",
+  "ref": "add-child-zone",
+  "version": "1.0.0",
+  "implementationDate": 1536233313089,
+  "dependencies": [],
+  "sub-modules": []
+}

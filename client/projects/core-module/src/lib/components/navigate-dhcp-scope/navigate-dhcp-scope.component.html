@@ -1,0 +1,37 @@
+<div class="row">
+  <div class="col-12">
+    <core-table-list *ngIf="selectable"
+                    auto-tag="existing-dhcp-scopes"
+                    [style]="['hs']"
+                    [data]="data"
+                    (cellClick)="onScopeClick($event)"
+                    [highlightRowFunc]="highlightRowFunc"
+                    [loading]="loading"
+                    [placeholder]="placeholder"
+                    [showPlaceholder]="showPlaceholder">
+      <core-table-list-column [header]="'Selected' | translate" [width]="'30px'">
+        <ng-template #headerTemplate>
+          <span></span>
+        </ng-template>
+        <ng-template #bodyTemplate let-row="row">
+          <span class="table-cell-radio">
+            <input type="radio" name="selection" [checked]="row.selected">
+          </span>
+        </ng-template>
+      </core-table-list-column>
+      <core-table-list-column [value]="'start'" [header]="'Start IP' | translate"></core-table-list-column>
+      <core-table-list-column [value]="'end'" [header]="'End IP' | translate"></core-table-list-column>
+    </core-table-list>
+    <core-table-list *ngIf="!selectable"
+                    [style]="['hs']"
+                    [data]="data"
+                    [loading]="loading"
+                    [placeholder]="placeholder"
+                    [showPlaceholder]="showPlaceholder"
+                    auto-tag="existing-dhcp-scope-table"
+                    >
+      <core-table-list-column [value]="'start'" [header]="'Start IP' | translate"></core-table-list-column>
+      <core-table-list-column [value]="'end'" [header]="'End IP' | translate"></core-table-list-column>
+    </core-table-list>
+  </div>
+</div>

@@ -1,0 +1,121 @@
+<div [hidden]="collapsed">
+  <div class="row" style="line-height: 28px">
+    <div class="col-3">
+      <label>{{ 'Jump to NETWORK' | translate:term }}</label>
+    </div>
+    <search-network (searchstart)="onSearchStart()" (searchend)="onSearchEnd($event)"></search-network>
+  </div>
+  <div class="row">
+    <div class="col-6 field mandatory">
+      <label>{{ 'Select Parent' | translate }}</label>
+      <core-table-list
+        auto-tag="select-parent-network-container"
+        [style]="['hm']" [data]="data.leftTableData"
+        (cellClick)="onLeftTableCellClick($event)" [highlightRowFunc]="highlightRowFunc"
+        [loading]="loadingLeftTable"
+        [placeholder]="'No NETWORKs or SUBNETs Found' | translate:term"
+        [showPlaceholder]="data.leftTableData.length === 0"
+        #leftTable>
+        <core-table-list-column [header]="'Selected'"
+                                [width]="'8%'"
+                                auto-tag="parent-network-table_selected-column">
+          <ng-template #headerTemplate>
+            <span></span>
+          </ng-template>
+          <ng-template #bodyTemplate let-row="row" let-index="index">
+            <span *ngIf="row.type === 'Network'" class="table-cell-radio table-cell-clickable">
+              <input type="radio" name="tableSelection" [checked]="row.selected" (change)="selectNetwork(row)">
+            </span>
+          </ng-template>
+        </core-table-list-column>
+        <core-table-list-column [header]="'IPAM'" [width]="'40%'"
+                                auto-tag="parent-network-table_ipam-column">
+          <ng-template #bodyTemplate let-row="row">
+            <span *ngIf="row.type === 'Network'" class="table-cell-ipam table-cell-clickable">
+              <i class="icon-folder" *ngIf="!row.selected"></i>
+              <i class="icon-folder-open" *ngIf="row.selected"></i>
+              <span><a (click)="openNetwork(row, $event)">{{ row.CIDR }}</a></span>
+            </span>
+            <span *ngIf="row.type === 'Subnet'" class="table-cell-ipam">
+              <i class="icon-sitemap"></i>
+              <span>{{ row.CIDR }}</span>
+            </span>
+          </ng-template>
+        </core-table-list-column>
+        <core-table-list-column [header]="'Name'"
+                                auto-tag="parent-network-table_name-column">
+          <ng-template #bodyTemplate let-row="row">
+            <span class="table-cell-clickable">
+              {{ row.name }}
+            </span>
+          </ng-template>
+        </core-table-list-column>
+      </core-table-list>
+      <div style="margin-top: 10px"></div>
+      <button class="button icon-button" [disabled]="!data.current" (click)="back()"><i class="icon-arrow-up"></i></button>
+    </div>
+    <div class="col-6 field">
+      <label>{{ 'Existing Children of Selected Parent' | translate }}</label>
+      <core-table-list [style]="['hm']"
+                       [data]="data.rightTableData"
+                       [loading]="loadingRightTable"
+                       [placeholder]="'No NETWORKs or SUBNETs Found' | translate:term"
+                       [showPlaceholder]="data.rightTableData.length === 0 && data.net"
+                       (cellClick)="onRightTableCellClick($event)"
+                       auto-tag="existing-children-of-selected-network-container">
+        <core-table-list-column [header]="'IPAM'" [width]="'40%'"
+                                auto-tag="existing-children-table_ipam-column">
+          <ng-template #bodyTemplate let-row="row">
+            <span *ngIf="row.type === 'Network'" class="table-cell-ipam table-cell-clickable">
+              <i class="icon-folder"></i>
+              <span>{{ row.CIDR }}</span>
+            </span>
+            <span *ngIf="row.type === 'Subnet'" class="table-cell-ipam">
+              <i class="icon-sitemap"></i>
+              <span>{{ row.CIDR }}</span>
+            </span>
+          </ng-template>
+        </core-table-list-column>
+        <core-table-list-column [header]="'Name'"
+                                auto-tag="existing-children-table_name-column">
+          <ng-template #bodyTemplate let-row="row">
+            <span class="table-cell-clickable">
+              {{ row.name }}
+            </span>
+          </ng-template>
+        </core-table-list-column>
+      </core-table-list>
+    </div>
+  </div>
+</div>
+<core-collapse [(ngModel)]="collapsed"></core-collapse>
+<div class="row">
+  <div class="col-12 field">
+    <div class="well"
+         [ngClass]="{'invalid': data.net && !data.net.accessible}"
+         auto-tag="selected-parent-information-container">
+      <core-loader [show]="loadingWell" auto-tag="selected-parent-information_loading"></core-loader>
+      <strong>{{ 'Selected Parent Path' | translate }}</strong>:
+      <span auto-tag="selected-parent-path">
+        <ul class="breadcrumb" *ngIf="data.current">
+          <li *ngFor="let item of data.current.parents">
+            <a (click)="onSearchEnd({searchedResult: item})">{{item.CIDR}}</a>
+          </li>
+          <li *ngIf="data.current && data.current.CIDR"><a (click)="onSearchEnd({searchedResult: data.current})">{{data.current.CIDR}}</a></li>
+          <li *ngIf="data.net">{{data.net.CIDR}}</li>
+          <li *ngIf="!data.net">{{'No Parent Selected' | translate}}</li>
+        </ul>
+        <ul class="breadcrumb" *ngIf="!data.current">
+          <li *ngIf="data.net">{{data.net.CIDR}}</li>
+          <li *ngIf="!data.net">{{'No Parent Selected' | translate}}</li>
+        </ul>
+      </span>
+      <br>
+      <strong>{{ 'Parent '|translate }}{{'GROUP' | translate:term }}s</strong>:
+      <span auto-tag="selected-parent-group">{{ displayParentGroups() }}</span>
+    </div>
+    <span auto-tag="selected-parent-information_error-container" *ngIf="data.net && !data.net.accessible">
+      <p *ngIf="data.net && !data.net.accessible">{{ 'You don\'t have write access on this NETWORK' | translate:term }}</p>
+    </span>
+  </div>
+</div>

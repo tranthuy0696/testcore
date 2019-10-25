@@ -1,0 +1,38 @@
+<div class="col-3">
+    <select auto-tag="search-options" class="select" [(ngModel)]="searchBy" [ngModelOptions]="{standalone: true}" (ngModelChange)="onSearchByChange()">
+      <option auto-tag="search-zone-option" [value]="JUMP_TO_ZONE">{{ 'Jump to DNS_ZONE' | translate:term }}</option>
+      <option auto-tag="search-dns-records-by-fqdn" [value]="SEARCH_BY_FQDN">{{ 'Search by FQDN' | translate:term }}</option>
+    </select>
+</div>
+<div class="col-8 field">
+    <core-select
+    [autoTagName]="'search-by-fqdn'"
+    [hidden]="searchBy !== SEARCH_BY_FQDN"
+    (search)="instantSearch($event)"
+    (valueChange)="valueChange()"
+    [loading]="searching"
+    placeholder="zaphod.mostlyharmless.tld"
+    #selectFqdn>
+  </core-select>
+  <core-select
+    [autoTagName]="'search-by-zone'"
+    [items]="searchedZones"
+    [hidden]="searchBy !== JUMP_TO_ZONE"
+    [(ngModel)]="searchedZone"
+    [ngModelOptions]="{standalone: true}"
+    (search)="instantSearch($event)"
+    [loading]="searching"
+    [textFields]="['fqdn']"
+    (selected)="onSelected()"
+    placeholder="mostlyharmless.tld"
+    #selectZone>
+  </core-select>
+  <span *ngIf="hasError" [ngClass]="{'invalid': hasError}">
+      <p> {{ errorMessage | translate:term }} </p>
+  </span>
+</div>
+<div class="col-1">
+  <button auto-tag="jump-to-zone" class="button full-width background-secondary" [disabled]="!goable()" (click)="search()">
+    {{ 'Go' | translate:term }}
+  </button>
+</div>

@@ -1,0 +1,53 @@
+{
+  "name": "pcn-portal-core-ui",
+  "version": "1.0.6",
+  "private": true,
+  "description": "PCN Portal Core UI",
+  "license": "Copyright 2019 PC Network Inc",
+  "publishConfig": {
+    "registry": "http://192.168.88.33:8083/repository/private-npm/",
+    "_auth": "YWRtaW46YWRtaW4xMjM=",
+    "email": "admin@example.org"
+  },
+  "scripts": {
+    "build": "ng build core-module",
+    "lint": "tslint -c ./tslint.json ./projects/core-module/src/**/*.ts -t verbose --fix"
+  },
+  "dependencies": {
+    "@angular/animations": "8.2.11",
+    "@angular/common": "8.0.1",
+    "@angular/compiler": "8.0.1",
+    "@angular/core": "8.0.1",
+    "@angular/forms": "8.0.1",
+    "@angular/http": "7.2.15",
+    "@angular/platform-browser": "8.0.1",
+    "@angular/router": "8.0.1",
+    "@ngx-translate/core": "11.0.1",
+    "@types/moment-timezone": "0.5.12",
+    "@types/socket.io-client": "1.4.32",
+    "js-cookie": "2.2.1",
+    "marked": "0.7.0",
+    "moment": "2.24.0",
+    "moment-timezone": "0.5.27",
+    "netmask": "1.0.6",
+    "ngx-toastr": "11.1.2",
+    "rxjs": "6.4.0",
+    "socket.io-client": "2.3.0",
+    "zone.js": "0.9.1"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "0.801.3",
+    "@angular-devkit/build-ng-packagr": "0.801.3",
+    "@angular/cli": "8.0.4",
+    "@angular/compiler-cli": "8.0.1",
+    "@angular/language-service": "8.0.1",
+    "@types/node": "8.9.4",
+    "codelyzer": "5.0.0",
+    "ng-packagr": "5.1.0",
+    "ts-node": "7.0.0",
+    "tsickle": "0.35.0",
+    "tslint": "5.15.0",
+    "typescript": "3.4.3",
+    "tslib": "1.9.0"
+  }
+}

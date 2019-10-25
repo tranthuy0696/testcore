@@ -1,0 +1,66 @@
+<div class="responsive">
+  <div class="table-list" [ngClass]="style" (click)="onTableClick()" #table>
+    <core-loader [show]="loading" [delay]="loadingDelay" auto-tag="table-list_loading"></core-loader>
+    <div class="table-list-header"></div>
+    <div class="table-list-body" #scroll>
+      <div class="placeholder" *ngIf="showPlaceholder"><span>{{ placeholder }}</span></div>
+      <table>
+        <colgroup>
+          <col *ngIf="selectable" [width]="'30px'">
+          <col *ngFor="let column of columns" span="1" [width]="column.width || ''"> <!-- FIXED IE BUG WHEN WIDTH UNDEFINED -->
+        </colgroup>
+        <thead>
+          <tr>
+            <th *ngIf="selectable">
+              <span class="table-cell-checkbox">
+                <input auto-tag="select-all-rows" type="checkbox" [(ngModel)]="selectingAll" (ngModelChange)="selectAll()" [disabled]="allowSelectAll">
+              </span>
+            </th>
+            <th *ngFor="let column of columns" [ngClass]="column.headerClazz">
+              <ng-container *ngIf="!column.headerTemplate">
+                <span [ngStyle]="{'width': column.width}" (click)="sort(column)">
+                  {{ column.header }}
+                  <i class="icon-sort-desc" *ngIf="isBeingSorted(column, true)"></i>
+                  <i class="icon-sort-asc" *ngIf="isBeingSorted(column, false)"></i>
+                </span>
+              </ng-container>
+              <ng-template *ngIf="column.headerTemplate" [ngTemplateOutlet]="column.headerTemplate">
+              </ng-template>
+            </th>
+          </tr>
+        </thead>
+        <tbody *ngIf="!showPlaceholder">
+          <tr *ngFor="let row of rows | filter: searching; let rowIndex = index"
+              [ngClass]="{'highlight': isHighlighted(row), 'expanded': row._expanded}" [attr.data-selected]="row.selected">
+            <td *ngIf="selectable">
+              <span class="table-cell-checkbox">
+                <input [attr.auto-tag] = "'row'+rowIndex" type="checkbox" [(ngModel)]="row.selected" (ngModelChange)="updateSelectingAll(row)">
+              </span>
+            </td>
+            <td
+              *ngFor="let column of columns; let columnIndex = index"
+              (click)="onCellClick($event, row[column.value], row, rowIndex, columnIndex, column)">
+                <ng-container *ngIf="!column.bodyTemplate">
+                  <span [innerHTML]="row[column.value] | safeHtml" [hidden]="editing" [ngStyle]="{'color': column.color || ''}"></span>
+                </ng-container>
+                <ng-template *ngIf="column.bodyTemplate && !editing"
+                  [ngTemplateOutlet]="column.bodyTemplate"
+                  [ngTemplateOutletContext]="{ $implicit: { value: row[column.value] }, value: row[column.value], row: row, index: {row: rowIndex, column: columnIndex} }">
+                </ng-template>
+                <div class="inline-editor" *ngIf="editable" [hidden]="!editing">
+                  <input *ngIf="!column.editorType || column.editorType === 'text'" type="text" [(ngModel)]="row[column.value]" (keyup.enter)="commitEditing()" [attr.auto-tag] = "column.value+rowIndex">
+                  <select *ngIf="column.editorType === 'boolean'" [(ngModel)]="row[column.value]" (keyup.enter)="commitEditing()" [attr.auto-tag] = "column.value+rowIndex">
+                    <option value="Yes">{{ 'Yes' | translate }}</option>
+                    <option value="No">{{ 'No' | translate }}</option>
+                  </select>
+                  <select *ngIf="column.editorType === 'select'" [(ngModel)]="row[column.value]" (keyup.enter)="commitEditing()" [attr.auto-tag] = "column.value+rowIndex">
+                    <option *ngFor="let option of column.editorOptions" [value]="option">{{ option }}</option>
+                  </select>
+                </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

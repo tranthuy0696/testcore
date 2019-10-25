@@ -1,0 +1,70 @@
+:host {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 1);
+  transition: all 0.5s;
+}
+
+.loader {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  margin: auto;
+  width: 30px;
+  height: 12px;
+}
+
+.square {
+  width: 8px;
+  height: 8px;
+  float: left;
+  top: -5px;
+  margin-right: 3px;
+  margin-top: 3px;
+  position: relative;
+  opacity: 0;
+  animation: enter 2.1s infinite;
+  -o-animation: enter 2.1s infinite;
+  -ms-animation: enter 2.1s infinite;
+  -webkit-animation: enter 2.1s infinite;
+  -moz-animation: enter 2.1s infinite;
+}
+
+.enter {
+  top: 0px;
+  opacity: 1;
+}
+
+.square:nth-child(1) {
+  animation-delay: 0.63s;
+  -o-animation-delay: 0.63s;
+  -ms-animation-delay: 0.63s;
+  -webkit-animation-delay: 0.63s;
+  -moz-animation-delay: 0.63s;
+}
+
+.square:nth-child(2) {
+  animation-delay: 0.735s;
+  -o-animation-delay: 0.735s;
+  -ms-animation-delay: 0.735s;
+  -webkit-animation-delay: 0.735s;
+  -moz-animation-delay: 0.735s;
+}
+
+.square:nth-child(3) {
+  animation-delay: 0.84s;
+  -o-animation-delay: 0.84s;
+  -ms-animation-delay: 0.84s;
+  -webkit-animation-delay: 0.84s;
+  -moz-animation-delay: 0.84s;
+}
+
+.last {
+  margin-right: 0;
+}

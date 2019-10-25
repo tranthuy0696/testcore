@@ -1,0 +1,112 @@
+<div [hidden]="collapsed">
+  <div class="row">
+    <search-zone (searchstart)="onSearchStart()" (searchend)="onSearchEnd($event)"></search-zone>
+  </div>
+  <div class="row">
+    <div class="col-6 field mandatory">
+      <label>{{ 'Select Parent DNS_ZONE' | translate:term }}</label>
+      <core-table-list
+        auto-tag="select-parent-zone-container"
+        [style]="display === 'compact' ? ['hml'] : ['hm']" [data]="data.leftTableData"
+        (cellClick)="onLeftTableCellClick($event)" [highlightRowFunc]="highlightRowFunc"
+        [loading]="loadingLeftTable"
+        [placeholder]="'No DNS_ZONEs Found' | translate:term"
+        [showPlaceholder]="data.leftTableData.length === 0"
+        #leftTable>
+        <core-table-list-column [header]="'Selected' | translate"
+                                [width]="'30px'">
+          <ng-template #headerTemplate>
+            <span></span>
+          </ng-template>
+          <ng-template #bodyTemplate let-row="row" let-index="index">
+            <span class="table-cell-radio table-cell-clickable" *ngIf="row.deployable">
+              <input type="radio" name="tableSelection" [checked]="row.selected" (change)="selectZone(row)">
+            </span>
+          </ng-template>
+        </core-table-list-column>
+        <core-table-list-column [header]="'DNS_ZONE' | translate:term"
+                                auto-tag="parent-network-table_ipam-column">
+          <ng-template #bodyTemplate let-row="row">
+            <span class="table-cell-ipam" [ngClass]="{'table-cell-clickable': row.deployable}">
+              <i class="icon-flow-branch"></i>
+              <span><a (click)="openZone(row, $event)">{{ row.fqdn }}</a></span>
+            </span>
+          </ng-template>
+        </core-table-list-column>
+      </core-table-list>
+      <div class="table-list-toolbar">
+        <button auto-tag="parent-table-up" class="button icon-button" [disabled]="!data.current" (click)="goUp()"><i class="icon-arrow-up"></i></button>
+        <core-select-spinner
+          [BackButtonAutoTagName]="'parent-table-prev'"
+          [SelectBoxAutoTagName]="'parent-table-paging'"
+          [NextButtonAutoTagName]="'parent-table-next'"
+          [min]="0"
+          [max]="leftTableMaxIndex"
+          [(value)]="leftTableIndex"
+          (valueChange)="onLeftTablePageChange()"
+          [labels]="leftTableIndexLabels"
+          [disabled]="leftTablePageDisabled">
+        </core-select-spinner>
+      </div>
+    </div>
+    <div class="col-6 field">
+      <label>{{ 'Child DNS_ZONEs' | translate:term }}</label>
+      <core-table-list [style]="display === 'compact' ? ['hml'] : ['hm']"
+                       [data]="data.rightTableData"
+                       [loading]="loadingRightTable"
+                       [placeholder]="'No DNS_ZONEs Found' | translate:term"
+                       [showPlaceholder]="data.zone && data.rightTableData.length === 0"
+                       auto-tag="existing-children-of-selected-zone-container"
+                       (cellClick)="onRightTableCellClick($event)">
+        <core-table-list-column [header]="'DNS_ZONE' | translate:term" [width]="'40%'"
+                                auto-tag="existing-children-table_ipam-column">
+          <ng-template #bodyTemplate let-row="row">
+            <span class="table-cell-ipam" [ngClass]="{'table-cell-clickable': row.deployable}">
+              <i class="icon-flow-branch"></i>
+              <span>{{ row.fqdn }}</span>
+            </span>
+          </ng-template>
+        </core-table-list-column>
+      </core-table-list>
+      <div class="table-list-toolbar">
+        <core-select-spinner
+          [BackButtonAutoTagName]="'child-table-prev'"
+          [SelectBoxAutoTagName]="'child-table-paging'"
+          [NextButtonAutoTagName]="'child-table-next'"
+          [min]="0"
+          [max]="rightTableMaxIndex"
+          [(value)]="rightTableIndex"
+          (valueChange)="onRightTablePageChange()"
+          [labels]="rightTableIndexLabels"
+          [disabled]="rightTablePageDisabled">
+
+        </core-select-spinner>
+      </div>
+    </div>
+  </div>
+</div>
+<div>
+  <core-collapse [(ngModel)]="collapsed"></core-collapse>
+  <div class="row">
+    <div class="col-12 field mandatory">
+      <div class="well">
+        <core-loader [show]="loadingWell"></core-loader>
+        <strong>{{ 'Selected Parent DNS_ZONE' | translate:term }}</strong>:
+        <span auto-tag="selected-parent-zone">
+            <ul class="breadcrumb" *ngIf="data.current">
+              <li *ngFor="let item of data.current.parents">
+                <a (click)="onSearchEnd(item)">{{item.fqdn}}</a>
+              </li>
+              <li *ngIf="data.current && data.current.fqdn"><a (click)="onSearchEnd(data.current)">{{data.current.fqdn}}</a></li>
+              <li *ngIf="data.zone">{{data.zone.fqdn}}</li>
+              <li *ngIf="!data.zone">{{ NO_PARENT_SELECTED }}</li>
+            </ul>
+            <ul class="breadcrumb" *ngIf="!data.current">
+              <li *ngIf="data.zone">{{data.zone.fqdn}}</li>
+              <li *ngIf="!data.zone">{{ NO_PARENT_SELECTED }}</li>
+            </ul>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+<div class="table" [ngClass]="style">
+  <table>
+    <thead>
+      <tr>
+        <th *ngIf="selectable" class="checkbox">
+          <input type="checkbox" [(ngModel)]="isAllRowsChecked" (ngModelChange)="checkOrUnCheckAllRows()" *ngIf="selectionMode === 'multi'">
+        </th>
+        <th *ngFor="let header of headers; let i = index;" [hidden]="isCellHidden(i)" (click)="sort(i)">
+          <span>
+            {{ header }}
+            <i class="icon-sort-desc" *ngIf="sortReverses[i] === true"></i>
+            <i class="icon-sort-asc" *ngIf="sortReverses[i] === false"></i>
+          </span>
+        </th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of rows | filter: searching | sort: true : selectedSortIndex : selectedSortReverse; let rowIndex = index;"
+      [ngClass]="row._expanded ? 'expanded' : ''" [ngClass]="{'selected': isRowSelected(rowIndex)}" >
+        <td *ngIf="selectable" class="checkbox">
+          <input type="checkbox" *ngIf="selectionMode === 'multi'" [(ngModel)]="rowSelection[rowIndex]" (ngModelChange)="fireRowSelectionChange()">
+          <input type="radio" *ngIf="selectionMode === 'single'" name="rowSelectionGroup" [value]="rowSelection[rowIndex]" (change)="updateRowSelection(rowIndex)">
+        </td>
+        <td *ngFor="let cell of row; let cellIndex = index;" (click)="cellClick(row, cell, cellIndex)"
+            [hidden]="isCellHidden(cellIndex)" [ngClass]="getCssClass(cell, cellIndex, row)">
+          <span [innerHTML]="cell | safeHtml"></span>
+        </td>
+        <td><i (click)="row._expanded = !row._expanded" [ngClass] = "row._expanded ? 'icon-chevron-up' : 'icon-chevron-down'" ></i></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

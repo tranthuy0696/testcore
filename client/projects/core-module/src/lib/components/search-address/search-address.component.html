@@ -1,0 +1,41 @@
+<div class="col-3 field">
+  <select auto-tag="search-options" class="select" [(ngModel)]="searchBy" [ngModelOptions]="{standalone: true}" (ngModelChange)="onSearchByChange()">
+    <option auto-tag="search-by-ip" [value]="SEARCH_BY_IP_ADDRESS">{{ 'Search by IP' | translate:term }}</option>
+    <option auto-tag="search-by-fqdn" [value]="SEARCH_BY_FQDN">{{ 'Search by FQDN' | translate:term }}</option>
+  </select>
+</div>
+<div class="col-8 field">
+  <core-select
+    [autoTagName]="'search-ip'"
+    [hidden]="searchBy !== SEARCH_BY_IP_ADDRESS"
+    [(ngModel)]="searchedAddress"
+    [ngModelOptions]="{standalone: true}"
+    (search)="instantSearch($event)"
+    (valueChange)="valueChange()"
+    [loading]="searching"
+    placeholder="4.2.8.8"
+    #selectIp>
+  </core-select>
+  <core-select
+    [autoTagName]="'search-ip-by-fqdn'"
+    [hidden]="searchBy !== SEARCH_BY_FQDN"
+    [items]="searchedHostRecords"
+    [(ngModel)]="searchedHostRecord"
+    [ngModelOptions]="{standalone: true}"
+    (search)="instantSearch($event)"
+    (selected)="onSelected()"
+    [loading]="searching"
+    [textFields]="['fqdn']"
+    placeholder="zaphod.mostlyharmless.tld"
+    (blur) = "onBlur()"
+    #selectFqdn>
+  </core-select>
+  <span *ngIf="hasError" [ngClass]="{'invalid': hasError}">
+    <p> {{ errorMessage | translate:term }} </p>
+  </span>
+</div>
+<div class="col-1">
+  <button auto-tag="search-button" class="button full-width background-secondary" [disabled]="!goable()" (click)="search()">
+    {{ 'Go' | translate:term }}
+  </button>
+</div>

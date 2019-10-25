@@ -1,0 +1,4 @@
+<div [attr.auto-tag]="autoTag" class="file-input button" [ngClass]="classes" (click)="onClick()">
+  <ng-content></ng-content>
+  <input type="file" (change)="fireChange($event); input.value=''" hidden="true" #input [id]="internalId">
+</div>

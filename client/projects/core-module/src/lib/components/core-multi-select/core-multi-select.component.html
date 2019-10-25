@@ -1,0 +1,22 @@
+<div class="multi-select">
+  <div class="input-box" (click)="toggleList()">
+    <div class="selected-items">
+      <div class="selected-item" *ngFor="let item of value" placement="right">
+          <div [ngClass]="highlight ? 'tooltip': ''" >
+            <span>{{ display(item) }}</span>
+            <span class="remove-button" (click)="remove(item)" *ngIf="item.writable !== false"><i class="icon-close"></i></span>
+            <span *ngIf = "text" class="tooltiptext">{{item[text]}}</span>
+          </div>
+      </div>
+    </div>
+    <div class="placeholder" *ngIf="isPlaceholderShown()">{{ placeholder }}</div>
+  </div>
+  <div class="dropdown-list" *ngIf="showingList">
+    <ul>
+      <li *ngFor="let item of items" (click)="check(item)" [hidden]="isSelected(item)">
+        <!-- <i class="icon-check" *ngIf="isSelected(item)"></i> -->
+        <span>{{ display(item) }}</span>
+      </li>
+    </ul>
+  </div>
+</div>
