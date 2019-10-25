@@ -29,7 +29,7 @@ pipeline {
 
           stash includes: 'dist/**/*', name: 'dist'
 					sh 'npm set registry http://192.168.88.33:8083/repository/private-npm/'
-					sh 'npm publish && echo $PWD'
+					sh 'cd client/dist/core-module && npm publish && cd ../../../'
 					sh "tar -cvzf ${FILENAME} -C dist ."
 					nexusArtifactUploader(
 							nexusVersion: 'nexus3',
