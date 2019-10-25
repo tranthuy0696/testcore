@@ -28,6 +28,7 @@ pipeline {
 					sh 'cd client && npm install && echo $PWD && npm run build && cd ../ && npm run build'
 
           stash includes: 'dist/**/*', name: 'dist'
+					sh 'npm set registry http://192.168.88.33:8083/repository/private-npm/'
 					sh 'cd client/dist/core-module && npm publish && cd ../../../'
 					sh "tar -cvzf ${FILENAME} -C dist ."
 					nexusArtifactUploader(
