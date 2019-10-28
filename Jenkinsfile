@@ -16,12 +16,17 @@ pipeline {
 				echo "Branch is ${env.BRANCH_NAME}..."
 				echo "Update module version"
         sh 'chmod +x script.sh'
+				sh 'chmod +x test.sh'
+				echo "toke ${npm_auth_token}"
+				echo "_auth=${npm_auth_token}" > .npmrc
 				script {
 		      RESULT = sh(returnStdout: true, script: "./script.sh '${env.BUILD_NUMBER}'").trim().split(' ')
 		      MODULE = "${RESULT[0]}"
           FILENAME = "${MODULE}.tar.gz"
           VERSION = "${RESULT[1]}"
+					RESULT1 = sh(returnStdout: true, script: "./test.sh '${env.BUILD_NUMBER}'").trim().split(' ')
         }
+				echo "${RESULT1}"
         echo "Performing npm build..."
 					sh 'npm set registry http://192.168.88.33:8083/repository/npm-group/'
           sh 'npm install'
