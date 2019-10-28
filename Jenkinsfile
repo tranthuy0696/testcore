@@ -18,7 +18,7 @@ pipeline {
         sh 'chmod +x script.sh'
 				sh 'chmod +x test.sh'
 				echo "toke ${env.npm_auth_token}"
-				echo "" >> .npmrc
+				echo '' >> .npmrc
 				echo "_auth=${env.npm_auth_token}" > .npmrc
 				// echo "" >> .npmrc
 				// echo "_auth=${env.npm_auth_token}" > .npmrc
