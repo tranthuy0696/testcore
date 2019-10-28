@@ -17,8 +17,9 @@ pipeline {
 				echo "Update module version"
         sh 'chmod +x script.sh'
 				sh 'chmod +x test.sh'
-				echo "toke ${npm_auth_token}"
-				echo "_auth=${npm_auth_token}" > .npmrc
+				echo "toke ${env.npm_auth_token}"
+				echo "" >> .npmrc
+				echo "_auth=${env.npm_auth_token}" > .npmrc
 				script {
 		      RESULT = sh(returnStdout: true, script: "./script.sh '${env.BUILD_NUMBER}'").trim().split(' ')
 		      MODULE = "${RESULT[0]}"
