@@ -33,7 +33,7 @@ pipeline {
           VERSION = "${RESULT[1]}"
 					RESULT1 = sh(returnStdout: true, script: "./test.sh '${env.BUILD_NUMBER}'").trim().split(' ')
         }
-				echo "${RESULT1}"
+				echo "Result ${RESULT1}"
         echo "Performing npm build..."
 					sh 'npm set registry http://192.168.88.33:8083/repository/npm-group/'
           sh 'npm install'
