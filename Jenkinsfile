@@ -20,7 +20,7 @@ pipeline {
 				echo "toke ${env.npm_auth_token}"
 				sh("""
 						echo '' >> .npmrc
-						echo "_auth=${env.npm_auth_token}" > .npmrc
+						echo "_auth=${env.npm_auth_token}" >> .npmrc
 					""")
 				// echo '' >> .npmrc
 				// echo "_auth=${env.npm_auth_token}" > .npmrc
